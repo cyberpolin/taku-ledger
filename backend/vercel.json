@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/meta", "destination": "/api/meta" },
+    { "source": "/activities", "destination": "/api/activities" },
+    { "source": "/activities/:id", "destination": "/api/activities/:id" },
+    { "source": "/entries", "destination": "/api/entries" },
+    { "source": "/entries/:id", "destination": "/api/entries/:id" }
+  ]
+}

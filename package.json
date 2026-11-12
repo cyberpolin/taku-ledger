@@ -1,0 +1,10 @@
+{
+  "name": "taku-restaurant",
+  "private": true,
+  "scripts": {
+    "dev:web": "npm --prefix web run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build:web": "npm --prefix web run build",
+    "typecheck:backend": "npm --prefix backend run typecheck"
+  }
+}

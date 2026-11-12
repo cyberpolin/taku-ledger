@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
+    <meta name="theme-color" content="#fafafa" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Money" />
+    <title>Money tracker</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <script type="module" crossorigin src="/src/main.tsx" fetchpriority="high"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      ;(async function () {
+        var key = 'money-tracker-version'
+        try {
+          var response = await fetch('/version.json', { cache: 'no-store' })
+          if (!response.ok) return
+          var data = await response.json()
+          var next = data && data.version
+          if (!next) return
+          var current = localStorage.getItem(key)
+          if (current && current !== next) {
+            localStorage.setItem(key, next)
+            if (window.caches) {
+              var names = await caches.keys()
+              await Promise.all(
+                names.map(function (name) {
+                  return caches.delete(name)
+                }),
+              )
+            }
+            location.replace(location.href)
+            return
+          }
+          localStorage.setItem(key, next)
+        } catch (error) {}
+      })()
+    </script>
+  </body>
+</html>
