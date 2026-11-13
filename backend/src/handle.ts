@@ -17,7 +17,7 @@ export async function handle(request: Request): Promise<Response> {
   if (request.method === 'OPTIONS') return empty(204)
 
   try {
-    authorize(request)
+    if (!isHealth(request)) authorize(request)
     return await route(request)
   } catch (error) {
     if (error instanceof HttpError) return json({ error: error.message }, error.status)
@@ -52,15 +52,25 @@ async function route(request: Request): Promise<Response> {
   throw new HttpError(404, 'Not found.')
 }
 
+function isHealth(request: Request): boolean {
+  if (request.method !== 'GET') return false
+  const parts = routePath(request)
+  return parts.length === 1 && parts[0] === 'health'
+}
+
 async function health(): Promise<Response> {
+  const problems: string[] = []
+  if (!process.env.API_TOKEN?.trim()) problems.push('API_TOKEN is not set.')
+
   try {
     await ensureSchema()
     const rows = await sql()`select 1 as ok`
-    if (rows.length === 0) throw new Error('Database is unavailable.')
+    if (rows.length === 0) problems.push('Database is unavailable.')
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Database is unavailable.'
-    throw new HttpError(503, message)
+    problems.push(error instanceof Error ? error.message : 'Database is unavailable.')
   }
+
+  if (problems.length > 0) throw new HttpError(503, problems.join(' '))
   return json({ status: 'ok' }, 200)
 }
 
