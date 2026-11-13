@@ -4,6 +4,7 @@ import {
   activitySchema,
   entrySchema,
   errorSchema,
+  healthSchema,
   metaSchema,
 } from './schema.ts'
 
@@ -17,7 +18,8 @@ export function openApiDocument(): Record<string, unknown> {
       version: CONTRACT_VERSION,
       description: [
         'HTTP contract for a money-tracker backend.',
-        'The app sends Authorization: Bearer on every request, including GET /meta.',
+        'The app sends Authorization: Bearer on every request, including GET /meta and GET /health.',
+        'GET /health checks that the database can accept a backup. Respond 503 with { "error": string } when it cannot.',
         'Allow the app origin in CORS for GET, PUT, and DELETE, and allow the Authorization header.',
         'PUT creates or replaces the resource with that id. Client ids are stable.',
         'DELETE sets deletedAt and returns the resource. Do not remove the row.',
@@ -44,6 +46,7 @@ export function openApiDocument(): Record<string, unknown> {
         ActivityList: listSchema('Activity'),
         EntryList: listSchema('Entry'),
         Meta: jsonSchema(metaSchema),
+        Health: jsonSchema(healthSchema),
         Error: jsonSchema(errorSchema),
       },
     },
@@ -54,6 +57,16 @@ export function openApiDocument(): Record<string, unknown> {
           responses: {
             '200': jsonResponse('Meta'),
             '401': jsonResponse('Error'),
+          },
+        }),
+      },
+      '/health': {
+        get: operation({
+          summary: 'Database is ready for a backup',
+          responses: {
+            '200': jsonResponse('Health'),
+            '401': jsonResponse('Error'),
+            '503': jsonResponse('Error'),
           },
         }),
       },

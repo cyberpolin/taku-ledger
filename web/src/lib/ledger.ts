@@ -4,6 +4,7 @@ import {
   activitySchema,
   contractMajor,
   entrySchema,
+  healthSchema,
   metaSchema,
   type Activity,
   type Entry,
@@ -110,6 +111,7 @@ export async function uploadLocalBackup(): Promise<{
   const config = loadServerConfig()
   if (!config) return { activities: 0, entries: 0 }
 
+  await readHealth(config)
   const meta = await readMeta(config)
   assertContract(meta.contractVersion)
 
@@ -148,6 +150,10 @@ export async function testConnection(config: ServerConfig): Promise<string> {
 function localSnapshot(): LedgerSnapshot {
   const activities = loadActivities()
   return { activities, entries: loadEntries(activities) }
+}
+
+async function readHealth(config: ServerConfig) {
+  return request(config, '/health', { method: 'GET' }, healthSchema)
 }
 
 async function readMeta(config: ServerConfig) {

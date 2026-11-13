@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/meta", "destination": "/api/meta" },
+    { "source": "/health", "destination": "/api/health" },
     { "source": "/activities", "destination": "/api/activities" },
     { "source": "/activities/:id", "destination": "/api/activities/:id" },
     { "source": "/entries", "destination": "/api/entries" },

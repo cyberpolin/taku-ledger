@@ -3,15 +3,16 @@ info:
   title: Money tracker
   version: 1.0.0
   description: 'HTTP contract for a money-tracker backend. The app sends
-    Authorization: Bearer on every request, including GET /meta. Allow the app
-    origin in CORS for GET, PUT, and DELETE, and allow the Authorization header.
-    PUT creates or replaces the resource with that id. Client ids are stable.
-    DELETE sets deletedAt and returns the resource. Do not remove the row. When
-    the same id is written twice, keep the resource with the later updatedAt.
-    updatedSince returns resources whose updatedAt is greater than that instant.
-    Respond 401 with { "error": string } for a missing or rejected token.
-    Respond 409 with { "error": string } only when the JSON body fails
-    validation.'
+    Authorization: Bearer on every request, including GET /meta and GET /health.
+    GET /health checks that the database can accept a backup. Respond 503 with {
+    "error": string } when it cannot. Allow the app origin in CORS for GET, PUT,
+    and DELETE, and allow the Authorization header. PUT creates or replaces the
+    resource with that id. Client ids are stable. DELETE sets deletedAt and
+    returns the resource. Do not remove the row. When the same id is written
+    twice, keep the resource with the later updatedAt. updatedSince returns
+    resources whose updatedAt is greater than that instant. Respond 401 with {
+    "error": string } for a missing or rejected token. Respond 409 with {
+    "error": string } only when the JSON body fails validation.'
 servers:
   - url: https://example.com
     description: Replace with the base URL saved in the app.
@@ -131,6 +132,15 @@ components:
         - contractVersion
         - serverTime
       additionalProperties: false
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+          const: ok
+      required:
+        - status
+      additionalProperties: false
     Error:
       type: object
       properties:
@@ -152,6 +162,28 @@ paths:
               schema:
                 $ref: "#/components/schemas/Meta"
         "401":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /health:
+    get:
+      summary: Database is ready for a backup
+      responses:
+        "200":
+          description: Health
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+        "401":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
           description: Error
           content:
             application/json:

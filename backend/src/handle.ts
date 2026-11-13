@@ -37,6 +37,10 @@ async function route(request: Request): Promise<Response> {
     )
   }
 
+  if (parts.length === 1 && resource === 'health' && request.method === 'GET') {
+    return health()
+  }
+
   if (resource === 'activities' && parts.length <= 2) {
     return resourceRoute(request, parts.length === 2 ? id : undefined, 'activity')
   }
@@ -46,6 +50,18 @@ async function route(request: Request): Promise<Response> {
   }
 
   throw new HttpError(404, 'Not found.')
+}
+
+async function health(): Promise<Response> {
+  try {
+    await ensureSchema()
+    const rows = await sql()`select 1 as ok`
+    if (rows.length === 0) throw new Error('Database is unavailable.')
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Database is unavailable.'
+    throw new HttpError(503, message)
+  }
+  return json({ status: 'ok' }, 200)
 }
 
 async function resourceRoute(

@@ -38,6 +38,10 @@ export const metaSchema = z.object({
   serverTime: dateTime,
 })
 
+export const healthSchema = z.object({
+  status: z.literal('ok'),
+})
+
 export const errorSchema = z.object({
   error: z.string().min(1),
 })
