@@ -1,4 +1,4 @@
-import { handle } from '../src/handle'
+import { handle } from '../src/handle.js'
 
 export default {
   fetch(request: Request) {

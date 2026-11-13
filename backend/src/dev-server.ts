@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { createServer, type IncomingMessage } from 'node:http'
-import { handle } from './handle'
+import { handle } from './handle.js'
 
 loadEnvFile()
 

@@ -3,15 +3,15 @@ import {
   sql,
   type ActivityRow,
   type EntryRow,
-} from './db'
-import { authorize, empty, HttpError, json, readJson, routePath } from './http'
+} from './db.js'
+import { authorize, empty, HttpError, json, readJson, routePath } from './http.js'
 import {
   activitySchema,
   CONTRACT_VERSION,
   entrySchema,
   type Activity,
   type Entry,
-} from './schema'
+} from './schema.js'
 
 export async function handle(request: Request): Promise<Response> {
   if (request.method === 'OPTIONS') return empty(204)
